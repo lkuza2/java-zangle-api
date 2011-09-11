@@ -36,6 +36,10 @@ public class ZClass extends ZangleObject {
      */
     private String lastname;
     /**
+     * Teacher's Email
+     */
+    private String email;
+    /**
      * Current percent in the class based on number of points
      */
     private double percent;
@@ -53,7 +57,7 @@ public class ZClass extends ZangleObject {
      * @param grade   Current students grade of the class
      * @param teacher Current teacher.  Format: "Bob Example"
      */
-    public ZClass(String name, String period, String grade, String teacher) {
+    public ZClass(String name, String period, String grade, String teacher, String email) {
         setName(name);
         setPeriod(period);
         setGrade(grade);
@@ -61,6 +65,7 @@ public class ZClass extends ZangleObject {
         String[] teacherArray = teacher.split(" ");
         setTeacherFirstName(teacherArray[0]);
         setTeacherLastName(teacherArray[1]);
+        setEmail(email);
     }
 
     /**
@@ -130,6 +135,14 @@ public class ZClass extends ZangleObject {
     }
 
     /**
+     * Sets the email for the teacher of the class
+     * @param email example@example or null
+     */
+    public void setEmail(String email){
+        this.email = email;
+    }
+
+    /**
      * Gets the name of the students class
      *
      * @return Returns name in string
@@ -190,6 +203,14 @@ public class ZClass extends ZangleObject {
      */
     public double getPercent() {
         return percent;
+    }
+
+    /**
+     * Gets the email of the teacher of the class, if supported.
+     * @return Returns the email, example@example.com or null if feature not supported.
+     */
+    public String getEmail(){
+        return email;
     }
 
     /**

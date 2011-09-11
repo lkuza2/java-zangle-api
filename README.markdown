@@ -1,6 +1,6 @@
 #Java-Zangle-API
 
-This is the project for the Java Zangle API written in Java.  Experimental branch.  All code that is in testing is here. Not stable.
+This is the project for the Java Zangle API written in Java.
 
 ## Changelog
 
