@@ -44,6 +44,11 @@ public interface ZangleConstants {
     final String ASSIGNMENT_EXTRA_CREDIT_NOT_GRADED_PARSE = "<img src=\"images/check3.gif\" height=\"15\" border=\"0\">";
 
     /**
+     * Line to search to find if assignment has details  Line 34
+     */
+    final String ASSIGNMENT_DETAILS = "title=\"Show Assignment Detail\"></a>";
+
+    /**
      * Line to search for if session expired
      */
     final String SESSION_LOGGED_OUT = "history.forward();";

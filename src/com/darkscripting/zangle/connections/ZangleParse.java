@@ -87,13 +87,22 @@ public class ZangleParse extends ZangleObject {
                 String className = parseForClass(studentAssign.get(index + 3));
                 //Skip 6 lines
                 String reverseteacher = parseForTeacher(studentAssign.get(index + 6));
+                String email = null;
+
+                if(reverseteacher.contains("@")){
+                     email = reverseteacher.split("'")[1].replace("mailto:", "");
+                    reverseteacher = reverseteacher.split(">")[1].replace("</a", "");
+
+                }
+
                 String[] teacherArray = reverseteacher.split(",");
                 String teacher = teacherArray[1] + " " + teacherArray[0];
+
 
                 //Skip 12 lines
                 String grade = parseForGrade(studentAssign.get(index + 12));
 
-                zclass.addClass(new ZClass(className, period, grade, teacher));
+                zclass.addClass(new ZClass(className, period, grade, teacher, email));
                 assignindex++;
                 do {
                     line = studentAssign.get(assignindex);
