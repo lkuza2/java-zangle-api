@@ -136,9 +136,10 @@ public class ZClass extends ZangleObject {
 
     /**
      * Sets the email for the teacher of the class
+     *
      * @param email example@example or null
      */
-    public void setEmail(String email){
+    public void setEmail(String email) {
         this.email = email;
     }
 
@@ -207,9 +208,10 @@ public class ZClass extends ZangleObject {
 
     /**
      * Gets the email of the teacher of the class, if supported.
+     *
      * @return Returns the email, example@example.com or null if feature not supported.
      */
-    public String getEmail(){
+    public String getEmail() {
         return email;
     }
 

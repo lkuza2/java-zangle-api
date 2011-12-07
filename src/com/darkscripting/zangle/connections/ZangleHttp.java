@@ -79,7 +79,7 @@ public class ZangleHttp extends ZangleResponse {
     /**
      * Gets HTTP data from zangle url
      *
-     * @param extension    Extensionof page, ex. stusel.aspx
+     * @param extension    Extension of page, ex. stusel.aspx
      * @param firstconnect If connecting for first time, omits not connected exception if set at true
      * @return Returns ArrayList of the response of the post
      * @throws Exception Throws exception if connection can not be made

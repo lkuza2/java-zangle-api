@@ -27,6 +27,10 @@ public class ZAssignment extends ZangleObject {
      */
     private String score;
     /**
+     * The assignments detail
+     */
+    private String details;
+    /**
      * Students percent on this assignment
      */
     private double percent;
@@ -48,14 +52,16 @@ public class ZAssignment extends ZangleObject {
      * @param points         Total points the assignment is worth
      * @param score          The students score on the assignment<br>
      *                       Pass nothing or null if there is no score yet
+     * @param details        Details of the assignment, if any
      * @param extracredit    True if this assignment is extra credit, false otherwise
      * @param notgraded      True if this assignment is extra credit, false otherwise
      */
-    public ZAssignment(String duedate, String assignmentname, String points, String score, boolean extracredit, boolean notgraded) {
+    public ZAssignment(String duedate, String assignmentname, String points, String score, String details, boolean extracredit, boolean notgraded) {
         setDueDate(duedate);
         setAssignmentName(assignmentname);
         setPoints(points);
         setScore(score);
+        setDetails(details);
         setExtraCredit(extracredit);
         setNotGraded(notgraded);
     }
@@ -95,6 +101,15 @@ public class ZAssignment extends ZangleObject {
      */
     public void setScore(String score) {
         this.score = score;
+    }
+
+    /**
+     * Sets the assignment details
+     *
+     * @param details The details of the assignment
+     */
+    public void setDetails(String details) {
+        this.details = details;
     }
 
     /**
@@ -169,6 +184,16 @@ public class ZAssignment extends ZangleObject {
         } else {
             return score;
         }
+    }
+
+    /**
+     * Gets the assignment details of this assignment
+     *
+     * @return Returns the assignments details.  Every new line is denoted by \n</br>
+     *         Returns blank if there is no details
+     */
+    public String getDetails() {
+        return details;
     }
 
     /**

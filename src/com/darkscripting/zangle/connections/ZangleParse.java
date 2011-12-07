@@ -89,8 +89,8 @@ public class ZangleParse extends ZangleObject {
                 String reverseteacher = parseForTeacher(studentAssign.get(index + 6));
                 String email = null;
 
-                if(reverseteacher.contains("@")){
-                     email = reverseteacher.split("'")[1].replace("mailto:", "");
+                if (reverseteacher.contains("@")) {
+                    email = reverseteacher.split("'")[1].replace("mailto:", "");
                     reverseteacher = reverseteacher.split(">")[1].replace("</a", "");
 
                 }
@@ -111,8 +111,10 @@ public class ZangleParse extends ZangleObject {
                         String assignmentname = parseAssignementData(studentAssign.get(assignindex + 6));
                         String points = parseAssignementData(studentAssign.get(assignindex + 9));
                         String score = parseAssignementData(studentAssign.get(assignindex + 13));
+                        String detail = studentAssign.get(assignindex - 3);
                         String extracreditdata = studentAssign.get(assignindex + 19);
                         String notgradeddata = studentAssign.get(assignindex + 23);
+
 
                         boolean extracredit;
                         boolean notgraded;
@@ -131,8 +133,18 @@ public class ZangleParse extends ZangleObject {
                             notgraded = false;
                         }
 
+                        //check if assignment contains a description
+                        if (detail.contains(ZangleConstants.ASSIGNMENT_DETAILS)) {
+                            //contains a description
+                            //Parse for assignment ID to retrieve description
+                            detail = returnAssignmentDetails(parseForAssignmentID(detail));
+                        } else {
+                            //return nothing if assignment does not contain description
+                            detail = "";
+                        }
 
-                        ZAssignment assignment = zclass.getClass(classIndex).getAssignments().addAssignment(new ZAssignment(duedate, assignmentname, points, score, extracredit, notgraded));
+
+                        ZAssignment assignment = zclass.getClass(classIndex).getAssignments().addAssignment(new ZAssignment(duedate, assignmentname, points, score, detail, extracredit, notgraded));
                         setAssignmentPercent(assignment);
                     }
                     assignindex++;
@@ -148,6 +160,47 @@ public class ZangleParse extends ZangleObject {
         } while (!line.contains(ZangleConstants.END_OF_CLASSES_HTML_PARSE));
 
         setClassPercents(zclass);
+    }
+
+    /**
+     * Returns the parsed detail of the assignment
+     *
+     * @param assignmentID Assignment to find
+     * @return Returns parsed String with details, \n denoting a new line
+     * @throws Exception Throws exception if there is a problem
+     */
+    public String returnAssignmentDetails(String assignmentID) throws Exception {
+        String assignmentURL = ZangleConstants.ASSIGNMENT_DESCRIPTION_EXTENSION + assignmentID;
+        ArrayList<String> page = http.get(assignmentURL, true);
+        StringBuffer stringBuffer = new StringBuffer();
+
+        String line;
+        int arrayindex = 0;
+
+        do {
+            line = page.get(arrayindex);
+            if (line.contains(ZangleConstants.ASSIGNMENT_DETAILS_PAGE)) {
+                if (line.contains(ZangleConstants.ASSIGNMENT_DETAILS_TITLE)) {
+                    stringBuffer.append(line.replace(ZangleConstants.ASSIGNMENT_DETAILS_TITLE, "").replace("</b>&nbsp;</td>", "") + "\n");
+                } else {
+                    stringBuffer.append(line.replace("<td valign=\"top\">", "").replace("</td>", "") + "\n");
+                }
+            }
+
+            arrayindex++;
+        }
+        while (!line.contains(ZangleConstants.END_OF_DETAILS_PAGE));
+        return stringBuffer.toString();
+    }
+
+    /**
+     * Returns the assignment ID to retrieve description
+     *
+     * @param description The unparsed line that contains the ID
+     * @return Parsed ID of the assignment
+     */
+    private String parseForAssignmentID(String description) {
+        return description.split("'")[1];
     }
 
     /**
@@ -198,6 +251,11 @@ public class ZangleParse extends ZangleObject {
 
     }
 
+    /**
+     * Sets the percent score for an assignment
+     *
+     * @param assignment The assignment to set the percent for
+     */
     private void setAssignmentPercent(ZAssignment assignment) {
         if (assignment.isExtraCredit()) {
             assignment.setPercent(00.00);
