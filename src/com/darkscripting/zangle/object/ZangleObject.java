@@ -21,5 +21,4 @@ public class ZangleObject {
      */
     protected static ZangleClass zclass = new ZangleClass();
 
-
 }

@@ -1,6 +1,7 @@
 package com.darkscripting.zangle.connections;
 
 import com.darkscripting.zangle.ZangleConnection;
+import com.darkscripting.zangle.classes.ZangleClass;
 import com.darkscripting.zangle.constants.ZangleConstants;
 import com.darkscripting.zangle.exceptions.InvalidUsernamePasswordException;
 import com.darkscripting.zangle.object.ZangleObject;
@@ -60,6 +61,8 @@ public class ZangleConnections extends ZangleObject {
      * @throws Exception Throws exception if username/password is incorrect or all else fails
      */
     public boolean connect(String zangleurl, String username, String password) throws Exception {
+        ZangleObject.zstudent = new ZStudent();
+        ZangleObject.zclass = new ZangleClass();
         ZangleConnections.username = username;
         ZangleConnections.password = password;
 
