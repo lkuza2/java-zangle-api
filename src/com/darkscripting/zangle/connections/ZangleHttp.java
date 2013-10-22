@@ -1,18 +1,17 @@
 package com.darkscripting.zangle.connections;
 
+import com.darkscripting.zangle.constants.ZangleConstants;
 import com.darkscripting.zangle.exceptions.NotConnectedException;
 import com.darkscripting.zangle.response.ZangleResponse;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.protocol.HTTP;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -47,6 +46,9 @@ public class ZangleHttp extends ZangleResponse {
 
     }
 
+    private List<String> cookies = new ArrayList<String>();
+    private CookieManager cookieManager = new CookieManager();
+
     /**
      * Method to post to the zangle url
      *
@@ -56,24 +58,34 @@ public class ZangleHttp extends ZangleResponse {
      * @return Returns ArrayList of the response of the post
      * @throws Exception Thrown if connection can not be made
      */
-    protected ArrayList<String> post(String extension, List<NameValuePair> data, boolean firstconnect) throws Exception {
+    protected ArrayList<String> post(String extension, HashMap<String, String> data, boolean firstconnect) throws Exception {
         if (ZangleConnections.connected == false) {
             if (firstconnect != true) {
                 throw new Exception("You are not connected!", new NotConnectedException());
             }
         }
-        HttpPost httpost = new HttpPost(ZangleConnections.mainzangleurl + extension);
 
-        List<NameValuePair> nvps = data;
+        URLConnection con = new URL(ZangleConnections.mainzangleurl + extension).openConnection();
+        con.setDoOutput(true);
+        con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        // String cookie = getCookies();
 
-        httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+        //con.setRequestProperty("Cookie", cookie);
+        con.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:20.0) Gecko/20100101 Firefox/20.0");
+        cookieManager.setCookies(con);
+        con.connect();
 
-        HttpResponse response = ZangleConnections.httpclient.execute(httpost);
-        HttpEntity entity = response.getEntity();
+        byte[] byteData = getRequestParamString(data).getBytes("UTF-8");
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(entity.getContent()));
+        OutputStream outputStream = con.getOutputStream();
 
-        return response(br, entity);
+        outputStream.write(byteData);
+        outputStream.flush();
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+
+        cookieManager.storeCookies(con);
+        return response(br);
     }
 
     /**
@@ -90,15 +102,19 @@ public class ZangleHttp extends ZangleResponse {
                 throw new Exception("You are not connected!", new NotConnectedException());
             }
         }
-        HttpGet httpget = new HttpGet(ZangleConnections.mainzangleurl + extension);
 
-        HttpResponse response = ZangleConnections.httpclient.execute(httpget);
-        HttpEntity entity = response.getEntity();
+        URLConnection con = new URL(ZangleConnections.mainzangleurl + extension).openConnection();
+        //String cookie = getCookies();
 
+        //con.setRequestProperty("Cookie", cookie);
+        cookieManager.setCookies(con);
+        con.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:20.0) Gecko/20100101 Firefox/20.0");
+        con.connect();
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(entity.getContent()));
+        BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
 
-        return response(br, entity);
+        cookieManager.storeCookies(con);
+        return response(br);
 
     }
 
@@ -108,11 +124,14 @@ public class ZangleHttp extends ZangleResponse {
                 throw new Exception("You are not connected!", new NotConnectedException());
             }
         }
-        HttpGet httpget = new HttpGet(ZangleConnections.mainzangleurl + extension);
+        URLConnection con = new URL(ZangleConnections.mainzangleurl + extension).openConnection();
+        //String cookie = getCookies();
 
-        HttpResponse response = ZangleConnections.httpclient.execute(httpget);
-        HttpEntity entity = response.getEntity();
-        entity.consumeContent();
+        con.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:20.0) Gecko/20100101 Firefox/20.0");
+        //con.setRequestProperty("Cookie", cookie);
+        cookieManager.setCookies(con);
+        con.connect();
+        cookieManager.storeCookies(con);
     }
 
     /**
@@ -123,21 +142,81 @@ public class ZangleHttp extends ZangleResponse {
      * @param firstconnect If connecting for first time, omits not connected exception if set at true
      * @throws Exception Thrown if connection can not be made
      */
-    protected void quickPost(String extension, List<NameValuePair> data, boolean firstconnect) throws Exception {
+    protected void quickPost(String extension, HashMap<String, String> data, boolean firstconnect) throws Exception {
         if (ZangleConnections.connected == false) {
             if (firstconnect != true) {
                 throw new Exception("You are not connected!", new NotConnectedException());
             }
         }
-        HttpPost httpost = new HttpPost(ZangleConnections.mainzangleurl + extension);
 
-        List<NameValuePair> nvps = data;
 
-        httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+        URLConnection con = new URL(ZangleConnections.mainzangleurl + extension).openConnection();
+        con.setDoOutput(true);
+        con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        con.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:20.0) Gecko/20100101 Firefox/20.0");
+        //String cookie = getCookies();
+        //System.out.println(cookie);
 
-        HttpResponse response = ZangleConnections.httpclient.execute(httpost);
-        HttpEntity entity = response.getEntity();
-        entity.consumeContent();
+        //con.setRequestProperty("Cookie", cookie);
+        cookieManager.setCookies(con);
+        con.connect();
+
+        byte[] byteData = getRequestParamString(data).getBytes("UTF-8");
+
+        OutputStream outputStream = con.getOutputStream();
+
+        outputStream.write(byteData);
+        outputStream.flush();
+        cookieManager.storeCookies(con);
+        outputStream.close();
+    }
+
+    protected void saveSessionCookie() throws Exception {
+        cookies.clear();
+        URLConnection con = new URL(ZangleConnections.mainzangleurl + ZangleConstants.DEFAULT_EXTENSION).openConnection();
+        con.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:20.0) Gecko/20100101 Firefox/20.0");
+
+        con.connect();
+
+        String headerName;
+        for (int i = 1; (headerName = con.getHeaderFieldKey(i)) != null; i++) {
+            if (headerName.equals("Set-Cookie")) {
+                String cookie = con.getHeaderField(i);
+                cookie = cookie.substring(0, cookie.indexOf(";"));
+                String cookieName = cookie.substring(0, cookie.indexOf("="));
+                String cookieValue = cookie.substring(cookie.indexOf("=") + 1, cookie.length());
+                cookies.add((cookieName + "=" + cookieValue).trim());
+            }
+        }
+    }
+
+    private String getCookies() {
+        String cookieString = "";
+        String[] cookiesArray = cookies.toArray(new String[0]);
+        int size = cookiesArray.length;
+        for (int i = 0; i < size; i++) {
+            if (i == size - 1) {
+                cookieString = cookieString + cookiesArray[i];
+                cookieString.trim();
+                break;
+            }
+            cookieString = cookieString + cookiesArray[i] + "; ";
+        }
+        return cookieString;
+    }
+
+    private String getRequestParamString(HashMap<String, String> data) {
+        String request = "";
+        Iterator<String> iterator = data.keySet().iterator();
+        String param = "";
+        while (iterator.hasNext()) {
+            String key = iterator.next();
+            String value = data.get(key);
+            param = key + "=" + value;
+            request = request + param + "&";
+        }
+        request = request.replace(param + "&", param);
+        return request;
     }
 
 }

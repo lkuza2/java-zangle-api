@@ -1,17 +1,13 @@
 package com.darkscripting.zangle.connections;
 
-import com.darkscripting.zangle.ZangleConnection;
 import com.darkscripting.zangle.classes.ZangleClass;
 import com.darkscripting.zangle.constants.ZangleConstants;
 import com.darkscripting.zangle.exceptions.InvalidUsernamePasswordException;
 import com.darkscripting.zangle.object.ZangleObject;
 import com.darkscripting.zangle.student.ZStudent;
-import org.apache.http.NameValuePair;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 /**
  * This class handles the connections and also contains the representation of the ZClass object
@@ -24,7 +20,7 @@ public class ZangleConnections extends ZangleObject {
     /**
      * Httpclient variable to access http methods
      */
-    protected static DefaultHttpClient httpclient = new DefaultHttpClient();
+    //protected static DefaultHttpClient httpclient = new DefaultHttpClient();
 
     /**
      * Static variable of the zangle url to connect to
@@ -71,12 +67,15 @@ public class ZangleConnections extends ZangleObject {
         } else {
             ZangleConnections.mainzangleurl = zangleurl + "/";
         }
-        List<NameValuePair> list = new ArrayList<NameValuePair>();
-        list.add(new BasicNameValuePair("stuident", ZangleConnections.username));
-        list.add(new BasicNameValuePair("stupassword", ZangleConnections.password));
-        list.add(new BasicNameValuePair("submit1", "Logon"));
+        //http.saveSessionCookie();
+
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("stuident", ZangleConnections.username);
+        params.put("stupassword", ZangleConnections.password);
+        params.put("submit1", "Logon");
+
         http.quickGet(ZangleConstants.DEFAULT_EXTENSION, true);
-        http.quickPost(ZangleConstants.LOGIN_CHECK_EXTENSION, list, true);
+        http.quickPost(ZangleConstants.LOGIN_CHECK_EXTENSION, params, true);
         ArrayList<String> response = http.get(ZangleConstants.STUDENT_SEL_EXTENSION, true);
         int size = response.size();
         int j = 0;
@@ -101,13 +100,13 @@ public class ZangleConnections extends ZangleObject {
      * @throws Exception Throws exception if username/password is incorrect or all else fails
      */
     private void reconnect() throws Exception {
-
-        List<NameValuePair> list = new ArrayList<NameValuePair>();
-        list.add(new BasicNameValuePair("stuident", ZangleConnections.username));
-        list.add(new BasicNameValuePair("stupassword", ZangleConnections.password));
-        list.add(new BasicNameValuePair("submit1", "Logon"));
+        //http.saveSessionCookie();
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("stuident", ZangleConnections.username);
+        params.put("stupassword", ZangleConnections.password);
+        params.put("submit1", "Logon");
         http.quickGet(ZangleConstants.DEFAULT_EXTENSION, false);
-        http.quickPost(ZangleConstants.LOGIN_CHECK_EXTENSION, list, false);
+        http.quickPost(ZangleConstants.LOGIN_CHECK_EXTENSION, params, false);
         ArrayList<String> response = http.get(ZangleConstants.STUDENT_SEL_EXTENSION, false);
         int size = response.size();
         int j = 0;
@@ -127,7 +126,6 @@ public class ZangleConnections extends ZangleObject {
      * Closes the connection, freeing system recourses
      */
     public void close() {
-        ZangleConnection.httpclient.getConnectionManager().shutdown();
         connected = false;
     }
 

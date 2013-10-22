@@ -1,7 +1,5 @@
 package com.darkscripting.zangle.response;
 
-import org.apache.http.HttpEntity;
-
 import java.io.BufferedReader;
 import java.util.ArrayList;
 
@@ -16,12 +14,11 @@ public class ZangleResponse {
     /**
      * Processes BufferedReader and entity to add the data to an array list
      *
-     * @param br     BufferedReader of a connection
-     * @param entity Http entity
+     * @param br BufferedReader of a connection
      * @return Returns an array list of all of the data of BufferedReader stream
      * @throws Exception Throws exception if there is a problem
      */
-    protected ArrayList<String> response(BufferedReader br, HttpEntity entity) throws Exception {
+    protected ArrayList<String> response(BufferedReader br) throws Exception {
         ArrayList<String> list = new ArrayList<String>();
         String str;
 
@@ -30,7 +27,6 @@ public class ZangleResponse {
         }
 
         br.close();
-        entity.consumeContent();
         return list;
     }
 
