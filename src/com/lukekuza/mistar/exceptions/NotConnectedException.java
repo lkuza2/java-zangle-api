@@ -1,4 +1,4 @@
-package com.darkscripting.zangle.exceptions;
+package com.lukekuza.mistar.exceptions;
 
 /**
  * Class for "NotConnectedException"

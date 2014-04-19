@@ -1,7 +1,7 @@
-package com.darkscripting.zangle.object;
+package com.lukekuza.mistar.object;
 
-import com.darkscripting.zangle.classes.ZangleClass;
-import com.darkscripting.zangle.student.ZStudent;
+import com.lukekuza.mistar.classes.ZangleClass;
+import com.lukekuza.mistar.student.ZStudent;
 
 /**
  * Represnts all ZangleObjects.  All objects that need these variables or contain student data extend off

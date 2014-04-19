@@ -1,6 +1,6 @@
-package com.darkscripting.zangle.assignment;
+package com.lukekuza.mistar.assignment;
 
-import com.darkscripting.zangle.exceptions.InvalidAssignmentIndexException;
+import com.lukekuza.mistar.exceptions.InvalidAssignmentIndexException;
 
 /**
  * Class that hold the assignment array for a certain class

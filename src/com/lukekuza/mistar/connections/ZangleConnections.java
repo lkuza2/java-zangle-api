@@ -1,10 +1,10 @@
-package com.darkscripting.zangle.connections;
+package com.lukekuza.mistar.connections;
 
-import com.darkscripting.zangle.classes.ZangleClass;
-import com.darkscripting.zangle.constants.ZangleConstants;
-import com.darkscripting.zangle.exceptions.InvalidUsernamePasswordException;
-import com.darkscripting.zangle.object.ZangleObject;
-import com.darkscripting.zangle.student.ZStudent;
+import com.lukekuza.mistar.classes.ZangleClass;
+import com.lukekuza.mistar.constants.ZangleConstants;
+import com.lukekuza.mistar.exceptions.InvalidUsernamePasswordException;
+import com.lukekuza.mistar.object.ZangleObject;
+import com.lukekuza.mistar.student.ZStudent;
 
 import java.util.ArrayList;
 import java.util.HashMap;

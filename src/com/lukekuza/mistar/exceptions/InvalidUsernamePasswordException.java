@@ -1,4 +1,4 @@
-package com.darkscripting.zangle.exceptions;
+package com.lukekuza.mistar.exceptions;
 
 /**
  * Thrown if password is incorrect

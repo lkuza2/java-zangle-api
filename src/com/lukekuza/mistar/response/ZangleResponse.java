@@ -1,4 +1,4 @@
-package com.darkscripting.zangle.response;
+package com.lukekuza.mistar.response;
 
 import java.io.BufferedReader;
 import java.util.ArrayList;

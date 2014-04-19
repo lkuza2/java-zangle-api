@@ -1,4 +1,4 @@
-package com.darkscripting.zangle.exceptions;
+package com.lukekuza.mistar.exceptions;
 
 /**
  * Thrown when you try to access an assignment with a specified index that does not exists

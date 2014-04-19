@@ -1,6 +1,6 @@
-package com.darkscripting.zangle;
+package com.lukekuza.mistar;
 
-import com.darkscripting.zangle.connections.ZangleConnections;
+import com.lukekuza.mistar.connections.ZangleConnections;
 
 /**
  * Connects/creates the ZangleConnection.  This class must be called.

@@ -1,7 +1,7 @@
-package com.darkscripting.zangle.student;
+package com.lukekuza.mistar.student;
 
-import com.darkscripting.zangle.classes.ZangleClass;
-import com.darkscripting.zangle.object.ZangleObject;
+import com.lukekuza.mistar.classes.ZangleClass;
+import com.lukekuza.mistar.object.ZangleObject;
 
 /**
  * Class which represents the student who is connected.  Contains methods for information of the student.

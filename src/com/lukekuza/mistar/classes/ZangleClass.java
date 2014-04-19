@@ -1,6 +1,6 @@
-package com.darkscripting.zangle.classes;
+package com.lukekuza.mistar.classes;
 
-import com.darkscripting.zangle.exceptions.InvalidClassIndexException;
+import com.lukekuza.mistar.exceptions.InvalidClassIndexException;
 
 /**
  * ZangleClass class. Hold array and function for returning the ZClass object

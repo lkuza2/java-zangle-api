@@ -1,4 +1,4 @@
-package com.darkscripting.zangle.connections;
+package com.lukekuza.mistar.connections;
 
 
 import java.io.IOException;
