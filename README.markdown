@@ -2,6 +2,8 @@
 
 This is the project for the Java Zangle API written in Java.
 
+Depends on the latest version of JSoup.
+
 ## Changelog
 
 * Version 1.50 BETA
