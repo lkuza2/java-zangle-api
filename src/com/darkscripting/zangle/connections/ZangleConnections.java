@@ -169,11 +169,7 @@ public class ZangleConnections extends ZangleObject {
      */
     public boolean isLoggedIn() throws Exception {
         ArrayList<String> studentPage = http.get(ZangleConstants.STUDENT_SEL_EXTENSION, false);
-        if (studentPage.get(14).contains(ZangleConstants.SESSION_LOGGED_OUT)) {
-            return true;
-        } else {
-            return false;
-        }
+        return studentPage.get(14).contains(ZangleConstants.SESSION_LOGGED_OUT);
     }
 
 

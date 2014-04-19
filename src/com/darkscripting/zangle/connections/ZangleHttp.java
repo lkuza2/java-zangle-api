@@ -1,6 +1,5 @@
 package com.darkscripting.zangle.connections;
 
-import com.darkscripting.zangle.constants.ZangleConstants;
 import com.darkscripting.zangle.exceptions.NotConnectedException;
 import com.darkscripting.zangle.response.ZangleResponse;
 
@@ -13,7 +12,6 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * Contains methods for getting http pages and posting to http pages and getting the response
@@ -27,7 +25,6 @@ public class ZangleHttp extends ZangleResponse {
      * Instance variable for singleton
      */
     private static ZangleHttp instance;
-    private List<String> cookies = new ArrayList<String>();
     private CookieManager cookieManager = new CookieManager();
 
     /**
@@ -59,8 +56,8 @@ public class ZangleHttp extends ZangleResponse {
      * @throws Exception Thrown if connection can not be made
      */
     protected ArrayList<String> post(String extension, HashMap<String, String> data, boolean firstconnect) throws Exception {
-        if (ZangleConnections.connected == false) {
-            if (firstconnect != true) {
+        if (!ZangleConnections.connected) {
+            if (!firstconnect) {
                 throw new Exception("You are not connected!", new NotConnectedException());
             }
         }
@@ -97,8 +94,8 @@ public class ZangleHttp extends ZangleResponse {
      * @throws Exception Throws exception if connection can not be made
      */
     protected InputStream getStream(String extension, boolean firstconnect) throws Exception {
-        if (ZangleConnections.connected == false) {
-            if (firstconnect != true) {
+        if (!ZangleConnections.connected) {
+            if (!firstconnect) {
                 throw new Exception("You are not connected!", new NotConnectedException());
             }
         }
@@ -125,8 +122,8 @@ public class ZangleHttp extends ZangleResponse {
      * @throws Exception Throws exception if connection can not be made
      */
     protected ArrayList<String> get(String extension, boolean firstconnect) throws Exception {
-        if (ZangleConnections.connected == false) {
-            if (firstconnect != true) {
+        if (!ZangleConnections.connected) {
+            if (!firstconnect) {
                 throw new Exception("You are not connected!", new NotConnectedException());
             }
         }
@@ -147,8 +144,8 @@ public class ZangleHttp extends ZangleResponse {
     }
 
     protected void quickGet(String extension, boolean firstconnect) throws Exception {
-        if (ZangleConnections.connected == false) {
-            if (firstconnect != true) {
+        if (!ZangleConnections.connected) {
+            if (!firstconnect) {
                 throw new Exception("You are not connected!", new NotConnectedException());
             }
         }
@@ -171,8 +168,8 @@ public class ZangleHttp extends ZangleResponse {
      * @throws Exception Thrown if connection can not be made
      */
     protected void quickPost(String extension, HashMap<String, String> data, boolean firstconnect) throws Exception {
-        if (ZangleConnections.connected == false) {
-            if (firstconnect != true) {
+        if (!ZangleConnections.connected) {
+            if (!firstconnect) {
                 throw new Exception("You are not connected!", new NotConnectedException());
             }
         }
@@ -197,40 +194,6 @@ public class ZangleHttp extends ZangleResponse {
         outputStream.flush();
         cookieManager.storeCookies(con);
         outputStream.close();
-    }
-
-    protected void saveSessionCookie() throws Exception {
-        cookies.clear();
-        URLConnection con = new URL(ZangleConnections.mainzangleurl + ZangleConstants.DEFAULT_EXTENSION).openConnection();
-        con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0");
-
-        con.connect();
-
-        String headerName;
-        for (int i = 1; (headerName = con.getHeaderFieldKey(i)) != null; i++) {
-            if (headerName.equals("Set-Cookie")) {
-                String cookie = con.getHeaderField(i);
-                cookie = cookie.substring(0, cookie.indexOf(";"));
-                String cookieName = cookie.substring(0, cookie.indexOf("="));
-                String cookieValue = cookie.substring(cookie.indexOf("=") + 1, cookie.length());
-                cookies.add((cookieName + "=" + cookieValue).trim());
-            }
-        }
-    }
-
-    private String getCookies() {
-        String cookieString = "";
-        String[] cookiesArray = cookies.toArray(new String[0]);
-        int size = cookiesArray.length;
-        for (int i = 0; i < size; i++) {
-            if (i == size - 1) {
-                cookieString = cookieString + cookiesArray[i];
-                cookieString.trim();
-                break;
-            }
-            cookieString = cookieString + cookiesArray[i] + "; ";
-        }
-        return cookieString;
     }
 
     private String getRequestParamString(HashMap<String, String> data) {

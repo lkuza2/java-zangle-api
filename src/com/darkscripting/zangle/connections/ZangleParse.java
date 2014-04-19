@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 
 /**
  * Class to parse and save/cache all information in one go to save time on later calls were reparsing
@@ -104,47 +103,6 @@ public class ZangleParse extends ZangleObject {
     }
 
     /**
-     * Returns the parsed detail of the assignment
-     *
-     * @param assignmentID Assignment to find
-     * @return Returns parsed String with details, \n denoting a new line
-     * @throws Exception Throws exception if there is a problem
-     */
-    public String returnAssignmentDetails(String assignmentID) throws Exception {
-        String assignmentURL = ZangleConstants.ASSIGNMENT_DESCRIPTION_EXTENSION + assignmentID;
-        ArrayList<String> page = http.get(assignmentURL, true);
-        StringBuffer stringBuffer = new StringBuffer();
-
-        String line;
-        int arrayindex = 0;
-
-        do {
-            line = page.get(arrayindex);
-            if (line.contains(ZangleConstants.ASSIGNMENT_DETAILS_PAGE)) {
-                if (line.contains(ZangleConstants.ASSIGNMENT_DETAILS_TITLE)) {
-                    stringBuffer.append(line.replace(ZangleConstants.ASSIGNMENT_DETAILS_TITLE, "").replace("</b>&nbsp;</td>", "") + "\n");
-                } else {
-                    stringBuffer.append(line.replace("<td valign=\"top\">", "").replace("</td>", "") + "\n");
-                }
-            }
-
-            arrayindex++;
-        }
-        while (!line.contains(ZangleConstants.END_OF_DETAILS_PAGE));
-        return stringBuffer.toString();
-    }
-
-    /**
-     * Returns the assignment ID to retrieve description
-     *
-     * @param description The unparsed line that contains the ID
-     * @return Parsed ID of the assignment
-     */
-    private String parseForAssignmentID(String description) {
-        return description.split("'")[1];
-    }
-
-    /**
      * Do maths to set the classes percents.  Do this here so it updates if new assignments come in.
      */
     private void setClassPercents(ZangleClass classes) throws Exception {
@@ -200,7 +158,6 @@ public class ZangleParse extends ZangleObject {
     private void setAssignmentPercent(ZAssignment assignment) {
         if (assignment.isExtraCredit()) {
             assignment.setPercent(00.00);
-            return;
         } else {
 
             double score = Double.parseDouble(assignment.getScore());
@@ -220,86 +177,5 @@ public class ZangleParse extends ZangleObject {
         }
 
 
-    }
-
-
-    /**
-     * Parses string for the class
-     *
-     * @param zclass Unparsed Class
-     * @return Returns parsed string
-     */
-    private String parseForClass(String zclass) {
-        return zclass.replace("&nbsp;", "").trim();
-    }
-
-    /**
-     * Parses string for the teacher name
-     *
-     * @param unparsedteacher Unparsed string
-     * @return Returns parsed string
-     */
-    private String parseForTeacher(String unparsedteacher) {
-        return unparsedteacher.replace("&nbsp;&nbsp;", "").replace("Teacher:", "").replace(" ", "").trim();
-    }
-
-    /**
-     * Parses unparsed String for grade
-     *
-     * @param unparsedgrade Unparsed string
-     * @return Returns parsed string.  Returns null if no there is absolutely no grade
-     */
-    private String parseForGrade(String unparsedgrade) {
-        String[] grade = unparsedgrade.replace("&nbsp;", "").split(":");
-        if (grade.length < 2) {
-            return null;
-        } else
-            return grade[1].trim();
-    }
-
-    private String parseForPeriod(String unparsedperiod) {
-        return unparsedperiod.replace("&nbsp;&nbsp;", "").replace("Period:", "").trim();
-    }
-
-    /**
-     * Parses for grade number
-     *
-     * @param unparsedgrade unparsed name
-     * @return returns string
-     */
-    private String parseForStudentGrade(String unparsedgrade) {
-        String[] grade = unparsedgrade.trim().split(" ");
-        return grade[4];
-    }
-
-    /**
-     * Parses for full name
-     *
-     * @param unparsedschool unparsed name
-     * @return returns string
-     */
-    private String parseForSchool(String unparsedschool) {
-        return unparsedschool.replace("&nbsp;", "").trim();
-    }
-
-    /**
-     * Parses for full name
-     *
-     * @param unparsedusername unparsed name
-     * @return returns string
-     */
-    private String parseForName(String unparsedusername) {
-        return unparsedusername.replace("<b>", "").replace("</b>", "").replace("&nbsp;", " ").trim();
-    }
-
-    /**
-     * Parses for data only from ASSIGNMENT VALUES including name, score, points possible and date <br>
-     * All the assignments value above parse the same.  Therefore this the method to parse all of them
-     *
-     * @param unparsedassignmentdata unparsed assignment data
-     * @return returns string
-     */
-    private String parseAssignementData(String unparsedassignmentdata) {
-        return unparsedassignmentdata.replace("&nbsp;", "").trim();
     }
 }
