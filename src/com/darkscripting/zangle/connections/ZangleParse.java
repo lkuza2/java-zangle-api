@@ -7,7 +7,11 @@ import com.darkscripting.zangle.classes.ZangleClass;
 import com.darkscripting.zangle.constants.ZangleConstants;
 import com.darkscripting.zangle.object.ZangleObject;
 import com.darkscripting.zangle.student.ZStudent;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -34,132 +38,69 @@ public class ZangleParse extends ZangleObject {
      * @throws Exception Throws exception if there is a problem
      */
     protected void parse() throws Exception {
-        ArrayList<String> studentPage = http.get(ZangleConstants.STUDENT_SEL_EXTENSION, true);
-        ArrayList<String> studentDem = http.get(ZangleConstants.STUDENT_DEM_EXTENSION, true);
-        ArrayList<String> studentAssign = http.get(ZangleConstants.STUDENT_ASSIGN_EXTENSION, true);
-        int index = 0;
+        InputStream studentPage = http.getStream(ZangleConstants.STUDENT_SEL_EXTENSION, true);
+        //ArrayList<String> studentDem = http.get(ZangleConstants.STUDENT_DEM_EXTENSION, true);
         ZStudent student = ZangleConnections.zstudent;
-        //When state == 2 done parsing
-        int state = 0;
 
-        do {
-            String line = studentPage.get(index);
 
-            if (line.contains(ZangleConstants.USERNAME_HTML_PARSE)) {
-                student.setName(parseForName(studentPage.get(index + 1)));
-                state++;
+        Document document = Jsoup.parse(studentPage, null, ZangleConnections.mainzangleurl + ZangleConstants.STUDENT_SEL_EXTENSION);
+
+        Elements studentInfo = document.getElementsByAttributeValue("class", "odd sturow").get(0).getElementsByAttributeValue("style", "white-space: nowrap;");
+
+        student.setName(studentInfo.get(0).text());
+        student.setGrade(studentInfo.get(1).text());
+        student.setSchool(studentInfo.get(2).text());
+        String studentID = document.getElementsByAttributeValue("class", "odd sturow").get(0).id();
+        studentPage.close();
+
+        http.quickGet(ZangleConstants.STUDENT_SELECTION_EXTENSION + studentID, true);
+
+        InputStream studentAssign = http.getStream(ZangleConstants.STUDENT_ASSIGN_EXTENSION, true);
+        document = Jsoup.parse(studentAssign, null, ZangleConnections.mainzangleurl + ZangleConstants.STUDENT_ASSIGN_EXTENSION);
+        Elements classes = document.getElementsByAttributeValue("class", "txtin3 displaytbl");
+
+        for (int i = 0; i < classes.size(); i++) {
+            Elements classInfo = classes.get(i).getElementsByAttributeValue("class", "tblhdr2 mediumHighlight").get(0).getElementsByTag("td");
+            Elements gradeInfo = classes.get(i).getElementsByAttributeValue("class", "tblhdr2 mediumHighlight").get(1).getElementsByTag("td");
+
+            String className = classInfo.get(0).getElementsByTag("b").get(1).text();
+            String period = classInfo.get(0).getElementsByTag("td").get(0).html().split("<b>")[1].split("</b>")[1].trim();
+            String grade = gradeInfo.get(0).text().split(":")[1].trim();
+            if (!grade.contains("not"))
+                grade = grade.split("\\(")[0].trim();
+            String teacherUnparsed[] = classInfo.get(1).text().split(":")[1].trim().split(",");
+            String teacher = teacherUnparsed[1].trim() + " " + teacherUnparsed[0];
+
+            className = className.split("\\(")[0].trim();
+            zclass.addClass(new ZClass(className, period, grade, teacher, ""));
+
+            //Add assignments
+            Elements assignments = classes.get(i).getElementsByTag("tbody").get(0).getElementsByTag("tr");
+
+            for (int j = 0; j < assignments.size(); j++) {
+                if (assignments.size() == 1 && assignments.get(0).text().contains("No"))
+                    break;
+
+                Elements assignmentInfo = assignments.get(j).getElementsByTag("td");
+
+                String dueDate = assignmentInfo.get(1).text();
+                String assignmentName = assignmentInfo.get(3).text();
+                String points = assignmentInfo.get(4).text();
+                String score = assignmentInfo.get(5).text();
+                if (score.isEmpty())
+                    score = "0";
+
+                boolean extraCredit = assignmentInfo.get(assignmentInfo.size() - 2).html().contains("check");
+                boolean notGraded = assignmentInfo.get(assignmentInfo.size() - 1).html().contains("check");
+
+                ZAssignment assignment = zclass.getClass(i).getAssignments().addAssignment(new ZAssignment(dueDate, assignmentName, points, score, "", extraCredit, notGraded));
+                setAssignmentPercent(assignment);
+
             }
 
-            if (line.contains(ZangleConstants.GRADE_HTML_PARSE)) {
-                //Skip 2 lines
-                student.setGrade(parseForStudentGrade(studentPage.get(index + 1)));
-                state++;
-            }
-
-
-            index++;
-        } while (state != 2);
-
-        index = 0;
-        boolean set = false;
-        do {
-
-            String line = studentDem.get(index);
-
-            if (line.contains(ZangleConstants.SCHOOL_HTML_PARSE)) {
-                //Skip 3 lines
-                student.setSchool(parseForSchool(studentDem.get(index + 3)));
-                set = true;
-            }
-            index++;
-        } while (set == false);
-
-        int classIndex = 0;
-        index = 0;
-        int assignindex = 0;
-        String line;
-        //String line2;
-        do {
-            line = studentAssign.get(index);
-            if (line.contains(ZangleConstants.CLASSES_HTML_PARSE)) {
-                String period = parseForPeriod(studentAssign.get(index));
-                //Skip 3 lines
-                String className = parseForClass(studentAssign.get(index + 3));
-                //Skip 6 lines
-                String reverseteacher = parseForTeacher(studentAssign.get(index + 6));
-                String email = null;
-
-                if (reverseteacher.contains("@")) {
-                    email = reverseteacher.split("'")[1].replace("mailto:", "");
-                    reverseteacher = reverseteacher.split(">")[1].replace("</a", "");
-
-                }
-
-                String[] teacherArray = reverseteacher.split(",");
-                String teacher = teacherArray[1] + " " + teacherArray[0];
-
-
-                //Skip 12 lines
-                String grade = parseForGrade(studentAssign.get(index + 12));
-
-                zclass.addClass(new ZClass(className, period, grade, teacher, email));
-                assignindex++;
-                do {
-                    line = studentAssign.get(assignindex);
-                    if (line.contains(ZangleConstants.ASSIGNMENT_HTML_PARSE)) {
-                        String duedate = parseAssignementData(studentAssign.get(assignindex + 3));
-                        String assignmentname = parseAssignementData(studentAssign.get(assignindex + 6));
-                        String points = parseAssignementData(studentAssign.get(assignindex + 9));
-                        String score = parseAssignementData(studentAssign.get(assignindex + 13));
-                        String detail = studentAssign.get(assignindex - 3);
-                        String extracreditdata = studentAssign.get(assignindex + 19);
-                        String notgradeddata = studentAssign.get(assignindex + 23);
-
-
-                        boolean extracredit;
-                        boolean notgraded;
-
-                        if (extracreditdata.contains(ZangleConstants.ASSIGNMENT_EXTRA_CREDIT_NOT_GRADED_PARSE)) {
-                            extracredit = true;
-                        } else {
-
-                            extracredit = false;
-                        }
-
-
-                        if (notgradeddata.contains(ZangleConstants.ASSIGNMENT_EXTRA_CREDIT_NOT_GRADED_PARSE)) {
-                            notgraded = true;
-                        } else {
-                            notgraded = false;
-                        }
-
-                        //check if assignment contains a description
-                        if (detail.contains(ZangleConstants.ASSIGNMENT_DETAILS)) {
-                            //contains a description
-                            //Parse for assignment ID to retrieve description
-                            detail = returnAssignmentDetails(parseForAssignmentID(detail));
-                        } else {
-                            //return nothing if assignment does not contain description
-                            detail = "";
-                        }
-
-
-                        ZAssignment assignment = zclass.getClass(classIndex).getAssignments().addAssignment(new ZAssignment(duedate, assignmentname, points, score, detail, extracredit, notgraded));
-                        setAssignmentPercent(assignment);
-                    }
-                    assignindex++;
-                }
-                while (!line.contains(ZangleConstants.CLASSES_HTML_PARSE) && !line.contains(ZangleConstants.END_OF_CLASSES_HTML_PARSE));
-
-                classIndex++;
-                index = assignindex - 2;
-            }
-
-            index++;
-            assignindex++;
-        } while (!line.contains(ZangleConstants.END_OF_CLASSES_HTML_PARSE));
-
-        setClassPercents(zclass);
+            setClassPercents(zclass);
+        }
+        studentAssign.close();
     }
 
     /**

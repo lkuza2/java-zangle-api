@@ -73,7 +73,11 @@ public interface ZangleConstants {
     /**
      * Student sel page  Contains student information.
      */
-    final String STUDENT_SEL_EXTENSION = "stusel.aspx";
+    final String STUDENT_SEL_EXTENSION = "Home/PortalMainPage";
+    /**
+     * Student selection page, to select student
+     */
+    final String STUDENT_SELECTION_EXTENSION = "StudentBanner/SetStudentBanner/";
     /**
      * Default page that must be called to get the cookie
      */
@@ -81,7 +85,7 @@ public interface ZangleConstants {
     /**
      * Login page that must be posted correct login details
      */
-    final String LOGIN_CHECK_EXTENSION = "logincheck.aspx";
+    final String LOGIN_CHECK_EXTENSION = "Home/Login";
     /**
      * Student demographics page.  Contains Student information
      */
@@ -89,7 +93,7 @@ public interface ZangleConstants {
     /**
      * Student Classes and Assignment page.  Contains ALL assignments
      */
-    final String STUDENT_ASSIGN_EXTENSION = "stuassignments.aspx?AssP=L";
+    final String STUDENT_ASSIGN_EXTENSION = "Home/LoadProfileData/Assignments%5Etrue";
     /**
      * Student Classes and Assignments page. Contains recent assignments
      */

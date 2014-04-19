@@ -31,12 +31,6 @@ public class ZangleConnections extends ZangleObject {
      * Static variable to see if we are connected to the zangle system.
      */
     protected static boolean connected = false;
-
-    /**
-     * Instance of ZangleHttp for get(); and post(); methods
-     */
-    private ZangleHttp http = ZangleHttp.getInstance();
-
     /**
      * Username
      */
@@ -45,7 +39,10 @@ public class ZangleConnections extends ZangleObject {
      * Password
      */
     private static String password;
-
+    /**
+     * Instance of ZangleHttp for get(); and post(); methods
+     */
+    private ZangleHttp http = ZangleHttp.getInstance();
 
     /**
      * Connects to specified connection.  If already connected, disconnects current connection.
@@ -70,9 +67,9 @@ public class ZangleConnections extends ZangleObject {
         //http.saveSessionCookie();
 
         HashMap<String, String> params = new HashMap<String, String>();
-        params.put("stuident", ZangleConnections.username);
-        params.put("stupassword", ZangleConnections.password);
-        params.put("submit1", "Logon");
+        params.put("Pin", ZangleConnections.username);
+        params.put("Password", ZangleConnections.password);
+        params.put("districtid", "");
 
         http.quickGet(ZangleConstants.DEFAULT_EXTENSION, true);
         http.quickPost(ZangleConstants.LOGIN_CHECK_EXTENSION, params, true);

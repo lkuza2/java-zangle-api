@@ -24,6 +24,7 @@ public class ZangleResponse {
 
         while ((str = br.readLine()) != null) {
             list.add(str);
+            //System.out.println(str);
         }
 
         br.close();

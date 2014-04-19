@@ -5,6 +5,7 @@ import com.darkscripting.zangle.exceptions.NotConnectedException;
 import com.darkscripting.zangle.response.ZangleResponse;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
@@ -26,6 +27,15 @@ public class ZangleHttp extends ZangleResponse {
      * Instance variable for singleton
      */
     private static ZangleHttp instance;
+    private List<String> cookies = new ArrayList<String>();
+    private CookieManager cookieManager = new CookieManager();
+
+    /**
+     * Constructor
+     */
+    private ZangleHttp() {
+
+    }
 
     /**
      * Gets the instance of ZangleHttp
@@ -38,16 +48,6 @@ public class ZangleHttp extends ZangleResponse {
         }
         return instance;
     }
-
-    /**
-     * Constructor
-     */
-    private ZangleHttp() {
-
-    }
-
-    private List<String> cookies = new ArrayList<String>();
-    private CookieManager cookieManager = new CookieManager();
 
     /**
      * Method to post to the zangle url
@@ -71,7 +71,7 @@ public class ZangleHttp extends ZangleResponse {
         // String cookie = getCookies();
 
         //con.setRequestProperty("Cookie", cookie);
-        con.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:20.0) Gecko/20100101 Firefox/20.0");
+        con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0");
         cookieManager.setCookies(con);
         con.connect();
 
@@ -96,6 +96,34 @@ public class ZangleHttp extends ZangleResponse {
      * @return Returns ArrayList of the response of the post
      * @throws Exception Throws exception if connection can not be made
      */
+    protected InputStream getStream(String extension, boolean firstconnect) throws Exception {
+        if (ZangleConnections.connected == false) {
+            if (firstconnect != true) {
+                throw new Exception("You are not connected!", new NotConnectedException());
+            }
+        }
+
+        URLConnection con = new URL(ZangleConnections.mainzangleurl + extension).openConnection();
+        //String cookie = getCookies();
+
+        //con.setRequestProperty("Cookie", cookie);
+        cookieManager.setCookies(con);
+        con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0");
+        con.connect();
+
+
+        cookieManager.storeCookies(con);
+        return con.getInputStream();
+    }
+
+    /**
+     * Gets HTTP data from zangle url
+     *
+     * @param extension    Extension of page, ex. stusel.aspx
+     * @param firstconnect If connecting for first time, omits not connected exception if set at true
+     * @return Returns ArrayList of the response of the post
+     * @throws Exception Throws exception if connection can not be made
+     */
     protected ArrayList<String> get(String extension, boolean firstconnect) throws Exception {
         if (ZangleConnections.connected == false) {
             if (firstconnect != true) {
@@ -108,7 +136,7 @@ public class ZangleHttp extends ZangleResponse {
 
         //con.setRequestProperty("Cookie", cookie);
         cookieManager.setCookies(con);
-        con.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:20.0) Gecko/20100101 Firefox/20.0");
+        con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0");
         con.connect();
 
         BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
@@ -127,7 +155,7 @@ public class ZangleHttp extends ZangleResponse {
         URLConnection con = new URL(ZangleConnections.mainzangleurl + extension).openConnection();
         //String cookie = getCookies();
 
-        con.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:20.0) Gecko/20100101 Firefox/20.0");
+        con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0");
         //con.setRequestProperty("Cookie", cookie);
         cookieManager.setCookies(con);
         con.connect();
@@ -153,7 +181,7 @@ public class ZangleHttp extends ZangleResponse {
         URLConnection con = new URL(ZangleConnections.mainzangleurl + extension).openConnection();
         con.setDoOutput(true);
         con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-        con.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:20.0) Gecko/20100101 Firefox/20.0");
+        con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0");
         //String cookie = getCookies();
         //System.out.println(cookie);
 
@@ -174,7 +202,7 @@ public class ZangleHttp extends ZangleResponse {
     protected void saveSessionCookie() throws Exception {
         cookies.clear();
         URLConnection con = new URL(ZangleConnections.mainzangleurl + ZangleConstants.DEFAULT_EXTENSION).openConnection();
-        con.setRequestProperty("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:20.0) Gecko/20100101 Firefox/20.0");
+        con.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0");
 
         con.connect();
 
