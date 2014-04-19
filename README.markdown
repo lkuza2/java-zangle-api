@@ -4,6 +4,11 @@ This is the project for the Java Zangle API written in Java.
 
 ## Changelog
 
+* Version 1.50 BETA
+    * Use JSoup for much quicker and cleaner parsing
+    * Updated parsing for the newest version of Zangle/MiStar/StudentConnection
+    * Cleaned some code
+
 * Version 1.05 BETA
     * Added getPercent() function for classes to get students current     percent in the class.
     * Added isExtraCredit and isNotGraded methods for ZAssignment class.
