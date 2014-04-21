@@ -6,6 +6,11 @@ Depends on the latest version of JSoup.
 
 ## Changelog
 
+* Version 1.55 BETA
+    * Fix login detection
+    * Fix timeout detection
+    * Remove more legacy code
+
 * Version 1.50 BETA
     * Use JSoup for much quicker and cleaner parsing
     * Updated parsing for the newest version of Zangle/MiStar/StudentConnection
