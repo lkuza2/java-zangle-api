@@ -2,8 +2,8 @@ package com.lukekuza.mistar.connections;
 
 import com.lukekuza.mistar.assignment.ZAssignment;
 import com.lukekuza.mistar.assignment.ZangleAssignment;
-import com.lukekuza.mistar.classes.ZangleClass;
 import com.lukekuza.mistar.classes.ZClass;
+import com.lukekuza.mistar.classes.ZangleClass;
 import com.lukekuza.mistar.constants.ZangleConstants;
 import com.lukekuza.mistar.object.ZangleObject;
 import com.lukekuza.mistar.student.ZStudent;
@@ -38,9 +38,7 @@ public class ZangleParse extends ZangleObject {
      */
     protected void parse() throws Exception {
         InputStream studentPage = http.getStream(ZangleConstants.STUDENT_SEL_EXTENSION, true);
-        //ArrayList<String> studentDem = http.get(ZangleConstants.STUDENT_DEM_EXTENSION, true);
         ZStudent student = ZangleConnections.zstudent;
-
 
         Document document = Jsoup.parse(studentPage, null, ZangleConnections.mainzangleurl + ZangleConstants.STUDENT_SEL_EXTENSION);
 

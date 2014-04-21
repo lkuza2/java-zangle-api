@@ -18,11 +18,6 @@ import java.util.HashMap;
 public class ZangleConnections extends ZangleObject {
 
     /**
-     * Httpclient variable to access http methods
-     */
-    //protected static DefaultHttpClient httpclient = new DefaultHttpClient();
-
-    /**
      * Static variable of the zangle url to connect to
      */
     protected static String mainzangleurl;
@@ -59,36 +54,16 @@ public class ZangleConnections extends ZangleObject {
         ZangleConnections.username = username;
         ZangleConnections.password = password;
 
-        if (zangleurl.endsWith("/")) {
+        if (zangleurl.endsWith("/"))
             ZangleConnections.mainzangleurl = zangleurl;
-        } else {
+        else
             ZangleConnections.mainzangleurl = zangleurl + "/";
-        }
-        //http.saveSessionCookie();
 
-        HashMap<String, String> params = new HashMap<String, String>();
-        params.put("Pin", ZangleConnections.username);
-        params.put("Password", ZangleConnections.password);
-        params.put("districtid", "");
+        performLogin(true);
 
-        http.quickGet(ZangleConstants.DEFAULT_EXTENSION, true);
-        http.quickPost(ZangleConstants.LOGIN_CHECK_EXTENSION, params, true);
-        ArrayList<String> response = http.get(ZangleConstants.STUDENT_SEL_EXTENSION, true);
-        int size = response.size();
-        int j = 0;
-        while (size > 0) {
-            if (response.get(j).contains("<b>Your Session Has Timed Out</b>")) {
-                throw new Exception("Invalid Username/Password", new InvalidUsernamePasswordException());
-            } else if (response.get(j).contains("<form name=\"studentform\" method=\"post\" action=\"stusel.aspx\">")) {
-                break;
-            }
-            size--;
-            j++;
-        }
         new ZangleParse().parse();
         connected = true;
         return true;
-
     }
 
     /**
@@ -97,26 +72,25 @@ public class ZangleConnections extends ZangleObject {
      * @throws Exception Throws exception if username/password is incorrect or all else fails
      */
     private void reconnect() throws Exception {
-        //http.saveSessionCookie();
-        HashMap<String, String> params = new HashMap<String, String>();
-        params.put("stuident", ZangleConnections.username);
-        params.put("stupassword", ZangleConnections.password);
-        params.put("submit1", "Logon");
-        http.quickGet(ZangleConstants.DEFAULT_EXTENSION, false);
-        http.quickPost(ZangleConstants.LOGIN_CHECK_EXTENSION, params, false);
-        ArrayList<String> response = http.get(ZangleConstants.STUDENT_SEL_EXTENSION, false);
-        int size = response.size();
-        int j = 0;
-        while (size > 0) {
-            if (response.get(j).contains("<b>Your Session Has Timed Out</b>")) {
-                throw new Exception("Invalid Username/Password", new InvalidUsernamePasswordException());
-            } else if (response.get(j).contains("<form name=\"studentform\" method=\"post\" action=\"stusel.aspx\">")) {
-                break;
-            }
-            size--;
-            j++;
-        }
+        performLogin(false);
+    }
 
+    /**
+     * Performs actual login of user
+     *
+     * @throws Exception Throws exception if username/password is incorrect or there is a connectione error
+     */
+    private void performLogin(boolean firstStart) throws Exception {
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("Pin", ZangleConnections.username);
+        params.put("Password", ZangleConnections.password);
+        params.put("districtid", "");
+
+        http.quickGet(ZangleConstants.STUDENT_SEL_EXTENSION, firstStart);
+
+        ArrayList<String> response = http.post(ZangleConstants.LOGIN_CHECK_EXTENSION, params, firstStart);
+        if (response.size() <= 0 || response.get(0).contains("Invalid"))
+            throw new Exception("Invalid Username/Password", new InvalidUsernamePasswordException());
     }
 
     /**
@@ -134,7 +108,6 @@ public class ZangleConnections extends ZangleObject {
     public boolean isConnected() {
         return connected;
     }
-
 
     /**
      * Representation of the student. Contains methods including Name, Grade, School etc.
@@ -169,7 +142,11 @@ public class ZangleConnections extends ZangleObject {
      */
     public boolean isLoggedIn() throws Exception {
         ArrayList<String> studentPage = http.get(ZangleConstants.STUDENT_SEL_EXTENSION, false);
-        return studentPage.get(14).contains(ZangleConstants.SESSION_LOGGED_OUT);
+        for (int i = 0; i < studentPage.size(); i++) {
+            if (studentPage.get(i).contains(ZangleConstants.SESSION_LOGGED_OUT))
+                return true;
+        }
+        return false;
     }
 
 
